@@ -1,0 +1,154 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>JavaScript Load Calculator</title>
+    <style>
+        .output {
+            font-weight: bold;
+        }
+
+        #payment {
+            text-decoration: underline;
+        }
+
+        #graph {
+            border: solid black 1px;
+        }
+
+        th, td {
+            vertical-align: top;
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <tr>
+            <th>Enter Load Data:</th>
+            <td></td>
+            <th>Load Balance, Cummulative Equity, and Interrest Payments</th>
+        </tr>
+        <tr>
+            <td>Amount of the load ($):</td>
+            <td><input id="amount" onchange="calculate();" /></td>
+            <td rowspan="8">
+                <canvas id="graph" width="400" height="250"></canvas>
+            </td>
+        </tr>
+        <tr>
+            <td>Annual interest (%):</td>
+            <td><input id="apr" onchange="calculate();" /></td>
+        </tr>
+        <tr>
+            <td>Repayment period (years):</td>
+            <td><input id="years" onchange="calculate();" /></td>
+        </tr>
+        <tr>
+            <td>Zipcode (to find lenders):</td>
+            <td><input id="zipcode" onchange="calculate();" /></td>
+        </tr>
+        <tr>
+            <th>Approximate Payments:</th>
+            <td><button onclick="calculate();">Calculate</button></td>
+        </tr>
+        <tr>
+            <td>Monthly payment:</td>
+            <td>$<span class="output" id="payment"></span></td>
+        </tr>
+        <tr>
+            <td>Total payment:</td>
+            <td>$<span class="output" id="total"></span></td>
+        </tr>
+        <tr>
+            <td>Total interest:</td>
+            <td>$<span class="output" id="totalinterest"></span></td>
+        </tr>
+        <tr>
+            <th>Sponsors:</th>
+            <td colspan="2">
+                Apply for your loan with one of these fine lenders:
+                <div id="lenders"></div>
+            </td>
+        </tr>
+    </table>
+    <script src="Scripts/jquery-2.1.1.js"></script>
+    <script>
+        "use strict";
+        function calculate() {
+            var amount = $("#amount");
+            var apr = $("#apr");
+            var years = $("#years");
+            var zipcode = $("#zipcode")
+            var payment = $("payment");
+            var total = $("total");
+            var totalinterest = $("totalinterest");
+
+            var principal = parseFloat(amount.value);
+            var interest = parseFloat(apr.value) / 100 / 12;
+            var payments = parseFloat(years.value) * 12;
+
+            var x = Math.pow(1 + interest, payments);
+            var montly = (principal * x * interest) / (x - 1);
+
+            if (isFinite(montly)) {
+                payment.innerHTML = montly.toFixed(2);
+                total.innerHTML = (montly * payment).toFixed(2);
+                totalinterest.innerHTML = ((monthly * payments) - principal).toFixed(2);
+
+                save(amount.value, apr.value, years.value, zipcode.value);
+
+                try {
+                    getLenders(amount.value, apr.value, years.value, zipcode.value);
+                }
+                catch (e) {
+                    chart(principal, interest, montly, payments);
+                }
+            }
+            else {
+                payment.innerHTML = "";
+                total.innerHTML = "";
+                totalinterest.innerHTML = "";
+                chart();
+            }
+        }
+
+        function save(amount, apr, years, zipcode) {
+            if (window.localStorage) {
+                localStorage.loan_amount = amount;
+                localStorage.loan_apr = apr;
+                localStorage.loan_years = years;
+                localStorage.loan_zipcode = zipcode;
+            }
+        }
+
+        window.onload = function () {
+            if (window.localStorage && localStorage.loan_amount) {
+                $("#amount").value = localStorage.loan_amount;
+                $("#apr").value = localStorage.loan_apr;
+                $("#years").value = localStorage.loan_years;
+                $("#zipcode").value = localStorage.loan_zipcode;
+            }
+        }
+
+        function getLenders(amout, apr, years, zipcode) {
+            if (!window.XMLHttpRequest) return;
+        }
+
+        function chart(principal, interest, monthly, payments) {
+            var graph = $("#graph");
+            graph.width = graph.width;
+
+            if (arguments.length == 0 || !graph.getContext) return;
+
+            var g = graph.getContext("2d");
+            var width = graph.width, height = graph.height;
+
+            function paymentToX(n) { return n * width / payments; }
+            function amountToY(a) { return height - (a * height / (monthly * payments * 1.05)); }
+
+            g.moveTo(paymentToX(0), amountToY(0));
+            g.lineTo(paymentToX(payments), amountToY(monthly * payments));
+
+        }
+    </script>
+</body>
+</html>

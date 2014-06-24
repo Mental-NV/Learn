@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Hello, JavaScript!</title>
+</head>
+<body>
+    <!--<h1 id="Title1">Hello, JavaScript!</h1>-->
+    <script src="Scripts/jquery-2.1.1.js"></script>
+    <script src="debug.js"></script>
+    <script src="hide.js"></script>
+    Hello
+    <button onclick="hide(this, true); debug('hide button 1');">Hide1</button>
+    <button onclick="hide(this); debug('hide button 2');">Hide2</button>
+    world!
+    <h1 id="jqt"></h1>
+    <script>
+        function plus1(x) {
+            return x + 1;
+        }
+        var square = function (x) {
+            return x * x;
+        };
+        var res = square(plus1(1));
+
+        function Point(x, y) {
+            this.x = x;
+            this.y = y;
+        }
+        var p = new Point(1, 1);
+        Point.prototype.r = function () {
+            return Math.sqrt(this.x * this.x + this.y * this.y);
+        };
+        debug(p.r());
+        $("#jqt").append($("<pre/>").text("Hello"));
+    </script>
+</body>
+</html>
