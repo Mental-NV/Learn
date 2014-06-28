@@ -39,3 +39,5 @@ Icon
 *.user
 [Bb]in
 [Oo]bj
+*.odw
+*.rwf
